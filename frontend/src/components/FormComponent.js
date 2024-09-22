@@ -41,7 +41,7 @@ function FormComponent() {
         <div>
           <h2>{audioInfo.title}</h2>
           <audio controls>
-            <source src={audioInfo.audioUrl} type="audio/webm" />
+            <source src={audioInfo.streamUrl} type="audio/webm" />
             Your browser does not support the audio element.
           </audio>
         </div>

@@ -13,20 +13,36 @@ app.get("/get-audio-info", async (req, res) => {
 
   try {
     const info = await ytdl.getInfo(url);
-    const audioFormat = ytdl.chooseFormat(info.formats, {
-      quality: "highestaudio",
-    });
-
     res.json({
       status: "SUCCESS",
       title: info.videoDetails.title,
-      audioUrl: audioFormat.url,
+      streamUrl: `/stream-audio?url=${encodeURIComponent(url)}`,
     });
   } catch (error) {
     console.error("Error getting video info:", error);
     res
       .status(500)
       .json({ status: "ERROR", message: "Failed to get video info" });
+  }
+});
+
+app.get("/stream-audio", (req, res) => {
+  const url = req.query.url;
+
+  if (!ytdl.validateURL(url)) {
+    return res.status(400).send("Invalid YouTube URL");
+  }
+
+  try {
+    res.setHeader("Content-Type", "audio/webm");
+
+    ytdl(url, {
+      quality: "highestaudio",
+      filter: "audioonly",
+    }).pipe(res);
+  } catch (error) {
+    console.error("Streaming error:", error);
+    res.status(500).send("Error occurred while streaming");
   }
 });
 
